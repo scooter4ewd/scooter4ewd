@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wave ball gear</title>
+    <script type="text/javascript">
+        function changeTeeth() {
+            var teeth = parseInt(document.getElementById("teeth").value);
+            var ball = teeth - 1;
+            document.getElementById("ball").value = ball;
+            var i = ball / (teeth - ball);
+            document.getElementById("i").value = i;
+            changeDb();
+        }
+
+        function changeBall() {
+            var ball = parseInt(document.getElementById("ball").value);
+            var teeth = ball + 1;
+            document.getElementById("teeth").value = teeth;
+            var i = ball / (teeth - ball);
+            document.getElementById("i").value = i;
+            changeDb();
+        }
+
+        function changeI() {
+            var i = parseInt(document.getElementById("i").value);
+            var ball = i;
+            document.getElementById("ball").value = ball;
+            var teeth = ball + 1;
+            document.getElementById("teeth").value = teeth;
+            changeDb();
+        }
+
+        function changeDb() {
+            var teeth = parseInt(document.getElementById("teeth").value);
+            var ball = parseInt(document.getElementById("ball").value);
+            var De = parseFloat(document.getElementById("De").value);
+            var Db = parseFloat(document.getElementById("Db").value);
+            var D = (De + Db) * teeth / ball;
+            document.getElementById("D").value = D;
+            var e = (D - De - Db) / 2;
+            document.getElementById("e").value = e;
+            drawGear();
+        }
+
+        function drawGear() {
+            var drawingCanvas = document.getElementById('pic');
+            if (drawingCanvas && drawingCanvas.getContext) {
+                var context = drawingCanvas.getContext('2d');
+                //context.fillStyle = "#FFFFFF"
+                context.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+
+                var ball = parseInt(document.getElementById("ball").value);
+                var teeth = ball + 1;
+                var De = parseFloat(document.getElementById("De").value);
+                var Db = parseFloat(document.getElementById("Db").value);
+                var D = parseFloat(document.getElementById("D").value);
+                var e = parseFloat(document.getElementById("e").value);
+                var Dgear = D + 2 * Db;
+                var m = Math.max((drawingCanvas.width - 2) / Dgear, (drawingCanvas.height - 2) / Dgear);
+                var x_с = drawingCanvas.width / 2;
+                var y_с = drawingCanvas.height / 2;
+
+                // Рисуем внешнюю обойму
+                context.strokeStyle = "#000000";
+                context.setLineDash([]);
+                context.beginPath();
+                context.arc(x_с, y_с, Dgear * m / 2, 0, 2 * Math.PI);
+                context.stroke();
+                // Рисуем эксцентрик
+                context.strokeStyle = "#000000";
+                context.setLineDash([]);
+                context.beginPath();
+                context.arc(x_с, y_с + e * m, De * m / 2, 0, 2 * Math.PI);
+                context.stroke();
+                // Рисуем ролики
+                for (var i = 0; i < ball; i++) {
+                    var angle = i * 2 * Math.PI / ball;
+                    var x = x_с + (De + Db) * Math.sin(angle) * m / 2;
+                    var y = y_с + e * m + (De + Db) * Math.cos(angle) * m / 2;
+                    context.strokeStyle = "#000000";
+                    context.setLineDash([]);
+                    context.beginPath();
+                    context.arc(x, y, Db * m / 2, 0, 2 * Math.PI);
+                    context.stroke();
+                }
+                // Рисуем зубья
+
+                                /*context.strokeStyle = "#ff5050";
+                                context.setLineDash([3,3]);
+                                context.beginPath();
+                                context.arc(x_с, y_с, D * m / 2, 0, 2 * Math.PI);
+                                context.stroke();
+                                context.beginPath();
+                                var k = teeth + 1;
+                                for (var a = 0; a < 2 * Math.PI; a += 2 * Math.PI / 360) {
+                                    var xp = x_с +e*k*m*(Math.sin(a)-Math.sin(k*a)/k);
+                                    var yp = y_с -e*k*m*(Math.cos(a)-Math.cos(k*a)/k);
+                                    context.lineTo(xp, yp);
+                                }
+                                context.closePath();
+                                context.stroke();*/
+
+                                /*context.strokeStyle = "#50ff50";
+                                context.setLineDash([3,3]);
+                                context.beginPath();
+                                context.arc(x_с, y_с, (De-2*e+2*Db) * m / 2, 0, 2 * Math.PI);
+                                context.stroke();
+                                context.beginPath();
+                                for (var a = 0; a < 2 * Math.PI * teeth; a += 2 * Math.PI / 20) {
+                                    var R = De-2*e+2*Db;
+                                    var r = R / teeth;
+                                    var h = r;
+                                    var xp = x_с + (R * (r / R + 1) * Math.sin(r / R * a) - h * Math.sin((r / R + 1) * a)) * m / 2;
+                                    var yp = y_с - (R * (r / R + 1) * Math.cos(r / R * a) - h * Math.cos((r / R + 1) * a)) * m / 2;
+                                    context.lineTo(xp, yp);
+                                }
+                                context.closePath();
+                                context.stroke();*/
+
+                /*                           context.strokeStyle = "#5050ff";
+                                           context.setLineDash([3, 3]);
+                                           context.beginPath();
+                                           {
+                                               var R2 = (De + Db) * (De + Db) / 4;
+                                               for (var a = 0; a < 2 * Math.PI * teeth; a += 2 * Math.PI / 40) {
+                                                   var xp = 12 * Math.PI * a;
+                                                   var kk = Math.sqrt(R2 - 4*e * e * Math.cos(a) * Math.cos(a));
+                                                   var yp = (/!*e * Math.cos(a)*!/ + kk) * m * 2;
+                                                   context.lineTo(xp, yp);
+                                               }
+                                           }
+                                           //context.closePath();
+                                           context.stroke();*/
+
+                context.strokeStyle = "#000000";
+                context.setLineDash([]);
+                context.beginPath();
+
+                for (var a = 0; a < 2 * Math.PI * teeth; a += 2 * Math.PI / 30) {
+                    var R = (De + Db) / 2;
+                    // var dy = e * Math.cos(a) - Math.sqrt(e * e * Math.sin(a) * Math.sin(a));
+                    // var dy = e * Math.cos(a) - Math.sqrt(R * R - 12*e * e * Math.sin(a) * Math.sin(a))+16*e;
+                    var dy = Math.sqrt(De * De /4 - e * e * Math.sin(a) * Math.sin(a))+e * Math.cos(a);
+                    // var dy = e * Math.cos(a) + e * Math.sin(a)* Math.sin(a)/Math.PI;
+                    // var dy = e * Math.cos(a);
+                    console.log(dy);
+                    // var xp = x_с + (De/2 + Db + dy) * Math.sin(a / teeth) * m ;
+                    // var yp = y_с + (De/2 + Db + dy) * Math.cos(a / teeth) * m ;
+
+                    var xp = x_с + (Db +  dy) * Math.sin(a / teeth) * m ;
+                    var yp = y_с + (Db +  dy) * Math.cos(a / teeth) * m ;
+
+
+                    context.lineTo(xp, yp);
+                }
+                context.closePath();
+                context.stroke();
+
+                context.strokeStyle = "#00ff00";
+                context.setLineDash([3,3]);
+                context.beginPath();
+
+                for (var a = 0; a < 2 * Math.PI * teeth; a += 2 * Math.PI / 30) {
+                    var dy = e * Math.cos(a);
+                    var xp = x_с + (De/2 + Db + dy) * Math.sin(a / teeth) * m ;
+                    var yp = y_с + (De/2 + Db + dy) * Math.cos(a / teeth) * m ;
+
+                    context.lineTo(xp, yp);
+                }
+                context.closePath();
+                context.stroke();
+
+
+                /*        context.strokeStyle = "#5050ff";
+                        context.setLineDash([]);
+                        context.beginPath();
+                        context.arc(x_с, y_с, (De/2+Db+e) * m, 0, 2 * Math.PI);
+                        context.stroke();
+                        context.beginPath();
+                        for (var a = 0; a < 2 * Math.PI * teeth/2; a += 2 * Math.PI / 80) {
+                            var R = (De + Db) / 2;
+                            // var dy = 2 * e * Math.cos(a) + Math.sqrt(R*R - 4 * e * e * Math.cos(a) * Math.cos(a));
+                            var dy =  2*e * Math.abs(Math.cos(a));
+                            var xp = x_с + (De/2+Db-e + dy) * Math.sin(a / teeth*2) * m;
+                            var yp = y_с + (De/2+Db-e + dy) * Math.cos(a / teeth*2) * m;
+
+                            context.lineTo(xp, yp);
+                        }
+                        context.closePath();
+                        context.stroke();*/
+
+                // context.strokeStyle = "#FF50ff";
+                // context.beginPath();
+                // for (var a = 0; a < 2 * Math.PI * teeth/2; a += 2 * Math.PI / 30) {
+                //     var R = (De + Db) / 2;
+                //     // var dy = 2 * e * Math.cos(a) + Math.sqrt(R*R - 4 * e * e * Math.cos(a) * Math.cos(a));
+                //     var dy =  e * Math.abs(Math.cos(a));
+                //     var xp = x_с + (De/2+Db-e + dy) * Math.sin(a / teeth*2) * m;
+                //     var yp = y_с + (De/2+Db-e + dy) * Math.cos(a / teeth*2) * m;
+                //
+                //     context.lineTo(xp, yp);
+                // }
+                // context.closePath();
+                // context.stroke();
+
+            }
+        }
+    </script>
+</head>
+<body onload="drawGear()">
+Волновые передачи с промежуточными телами
+<table>
+    <tr>
+        <td>Количество зубьев</td>
+        <td>N</td>
+        <td><input id="teeth" onchange="changeTeeth()" value="17"></td>
+    </tr>
+    <tr>
+        <td>Количество шариков</td>
+        <td>n</td>
+        <td><input id="ball" onchange="changeBall()" value="16"></td>
+    </tr>
+    <tr>
+        <td>Передаточное отношение</td>
+        <td>i=n/(N-n)</td>
+        <td><input id="i" onchange="changeI()" value="16"></td>
+    </tr>
+    <tr>
+        <td>Диаметр эксцентрика</td>
+        <td>De</td>
+        <td><input id="De" onchange="changeDb()" value="24"></td>
+    </tr>
+    <tr>
+        <td>Диаметр шарика</td>
+        <td>Db</td>
+        <td><input id="Db" onchange="changeDb()" value="4.4"></td>
+    </tr>
+    <tr>
+        <td>Диаметр шестерни</td>
+        <td>D=(De+Db)N/n</td>
+        <td><input id="D" onchange="drawGear()" value="30.175"></td>
+    </tr>
+    <tr>
+        <td>Эксцентрик</td>
+        <td>e=(D-De-Db)/2</td>
+        <td><input id="e" onchange="drawGear()" value="0.8875"></td>
+    </tr>
+</table>
+<canvas id="pic" width="800" height="800">
+    <p>canvas not supported</p>
+</canvas>
+</body>
+</html>

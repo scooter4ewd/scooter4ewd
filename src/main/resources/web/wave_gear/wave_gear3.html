@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Wave ball gear</title>
+    <script type="text/javascript">
+        function changeN() {
+            var n = getN();
+            var nPlus = n + 1;
+            document.getElementById("nPlus").value = nPlus;
+            solveDGear(n);
+            solveE(n);
+            drawGear();
+        }
+
+        function changeD() {
+            var n = getN();
+            solveDGear(n);
+            solveE(n);
+            drawGear();
+        }
+
+        function changeNPlus() {
+            var nPlus = parseInt(document.getElementById("nPlus").value);
+            var n = nPlus - 1;
+            document.getElementById("n").value = n;
+            solveDGear(n);
+            solveE(n);
+            drawGear();
+        }
+
+        function changeDGear() {
+            var n = getN();
+            var dGear = parseFloat(document.getElementById("dGear").value);
+            var d = dGear / n;
+            document.getElementById("d").value = d;
+            solveE(n);
+            drawGear();
+        }
+
+        function changeKyk() {
+            var n = getN();
+            solveE(n);
+            drawGear();
+        }
+
+        function changeE() {
+            //TODO
+            // var e = parseFloat(document.getElementById("e").value);
+            // var n = getN();
+            // var nPlus = n + 1;
+            // var D = getD();
+            // var Kyk = 2 * e / D / (1 - n / nPlus);
+            // document.getElementById("Kyk").value = Kyk;
+            // drawGear();
+        }
+
+        function getN() {
+            var n = parseInt(document.getElementById("n").value);
+            return n;
+        }
+
+        function getD() {
+            var d = parseFloat(document.getElementById("d").value);
+            return d;
+        }
+
+        function solveDGear(n) {
+            var d = getD();
+            var dGear = d*n;
+            document.getElementById("dGear").value = dGear;
+        }
+
+        function solveE(n) {
+            var dGear = parseFloat(document.getElementById("dGear").value);
+            var Kyk = parseFloat(document.getElementById("Kyk").value);
+            var e = dGear * (1 - n / (n + 1)) / 2 * Kyk;
+            document.getElementById("e").value = e;
+        }
+
+        function drawGear() {
+            var drawingCanvas = document.getElementById('pic');
+            if (drawingCanvas && drawingCanvas.getContext) {
+                var context = drawingCanvas.getContext('2d');
+                //context.fillStyle = "#FFFFFF"
+                context.clearRect(0, 0, drawingCanvas.width, drawingCanvas.height);
+
+                var n = getN();
+                var nPlus = n + 1;
+                var d = getD();
+                var dGear = d * n;
+                var e = parseFloat(document.getElementById("e").value);
+
+                var m = Math.max((drawingCanvas.width - 2) / (dGear + 2 * d+3*e), (drawingCanvas.height - 2) / (dGear + 2 * d+3*e));
+                var x_с = drawingCanvas.width / 2;
+                var y_с = drawingCanvas.height / 2;
+
+                // Рисуем зубья
+                // https://ru.wikipedia.org/wiki/%D0%AD%D0%BF%D0%B8%D1%82%D1%80%D0%BE%D1%85%D0%BE%D0%B8%D0%B4%D0%B0
+                // Эпитрохоида
+                context.strokeStyle = "#aaaaaa";
+                context.lineWidth = d * m;
+                context.setLineDash([]);
+                context.beginPath();
+                for (var a = 0; a < 2 * Math.PI * n; a += 2 * Math.PI / 32) {
+                    var xp = x_с + (dGear * (1 / n + 1) * Math.cos(a/n) / 2 - e * Math.cos((1 / n + 1) * a)) * m;
+                    if (!document.getElementById("eVisible").checked) {
+                        xp += e * m;
+                    }
+                    var yp = y_с + (dGear * (1 / n + 1) * Math.sin(a/n) / 2 - e * Math.sin((1 / n + 1) * a)) * m;
+                    context.lineTo(xp, yp);
+                }
+                context.closePath();
+                context.stroke();
+
+                if (document.getElementById("DGearVisible").checked) {
+                    // Рисуем диаметр
+                    context.strokeStyle = "#000000";
+                    context.lineWidth = 1;
+                    context.setLineDash([3, 3]);
+                    context.beginPath();
+                    context.arc(x_с, y_с, dGear * m / 2, 0, 2 * Math.PI);
+                    context.stroke();
+                }
+
+                // Рисуем ролики
+                for (var i = 0; i < nPlus; i++) {
+                    var angle = i * 2 * Math.PI / nPlus;
+                    var x = x_с + (dGear+d) * Math.cos(angle) * m / 2;
+                    var y = y_с + (dGear+d) * Math.sin(angle) * m / 2;
+                    context.strokeStyle = "#000000";
+                    context.lineWidth = 1;
+                    context.setLineDash([]);
+                    context.beginPath();
+                    context.arc(x, y, d * m / 2, 0, 2 * Math.PI);
+                    context.stroke();
+                }
+
+                if (document.getElementById("nVisible").checked) {
+                    context.strokeStyle = "#ff5050";
+                    context.lineWidth = 1;
+                    context.setLineDash([3, 3]);
+                    context.beginPath();
+                    for (var a = 0; a < 2 * Math.PI * n; a += 2 * Math.PI / 32) {
+                        var xp = x_с + (dGear * (1/n + 1) * Math.cos(a/n) / 2 - e * Math.cos((1/n + 1) * a)) * m;
+                        if (!document.getElementById("eVisible").checked) {
+                            xp += e * m;
+                        }
+                        var yp = y_с + (dGear * (1/n + 1) * Math.sin(a/n) / 2 - e * Math.sin((1/n + 1) * a)) * m;
+                        context.lineTo(xp, yp);
+                    }
+                    context.closePath();
+                    context.stroke();
+                }
+            }
+        }
+    </script>
+</head>
+<body onload="drawGear()">
+Волновые передачи с промежуточными телами качения
+<table>
+    <tr>
+        <td>Количество зубъев</td>
+        <td>n</td>
+        <td><input id="n" onchange="changeN()" value="9"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Диаметр ролика</td>
+        <td>d</td>
+        <td><input id="d" onchange="changeD()" value="10"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Количество роликов</td>
+        <td>N=n+1</td>
+        <td><input id="nPlus" onchange="changeNPlus()" value="10"></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Диаметр</td>
+        <td>dGear=d*n</td>
+        <td><input id="dGear" onchange="changeDGear()" value="90"></td>
+        <td><input type="checkbox" id="DGearVisible" onchange="drawGear()"></td>
+    </tr>
+    <tr>
+        <td>Kyk</td>
+        <td>Kyk=0.55 ... 0.85</td>
+        <td><input id="Kyk" onchange="changeKyk()" value="0.6"></td>
+    </tr>
+    <tr>
+        <td>Эксцентрик</td>
+        <td>e=dGear*(1-n/N)/2*Kyk</td>
+        <td><input id="e" onchange="changeE()" value="2.4"></td>
+        <td><input type="checkbox" id="eVisible" onchange="drawGear()"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td colspan="2">x=dGear(1/n+1)*cos(t/n)/2-e*cos((1/n+1)*t)</td>
+        <td rowspan="2"><input type="checkbox" id="nVisible" onchange="drawGear()"></td>
+    </tr>
+    <tr>
+        <td></td>
+        <td colspan="2">y=dGear(1/n+1)*sin(t/n)/2-e*sin((1/n+1)*t)</td>
+    </tr>
+</table>
+<canvas id="pic" width="800" height="800">
+    <p>canvas not supported</p>
+</canvas>
+</body>
+</html>
