@@ -16,6 +16,18 @@ package scooter4ewd;
  *     <li>C3 - центр задней оси</li>
  * </p>
  * <p>
+ * <blockquote><pre>
+ *     L1--------C1--------R1
+ *     |         |         |
+ *     L2--------C2--------R2
+ *
+ *
+ *
+ *
+ *
+ *
+ *               C3
+ * </blockquote></pre>
  * TODO перенести в трехмерное пространство - ось вращения руля не совпадает с осью вращения колес
  * </p>
  * <p>Конструкция упирается в ограничение выноса поворотного кулака в стороны 20 мм, больше нельзя будет тереться о колесо.</p>
@@ -24,17 +36,9 @@ package scooter4ewd;
  * <p>Вынос поворотного кулака в стороны:20.0 мм (относительно центра вращения колеса в ширь)</p>
  * <p>Длина рулевой сошки:93.0</p>
  * <p>Погрешность:108.70467597872509</p>
+ * <p>Time:9193ms</p>
  */
 public class BruteForceAkkerman20 {
-
-    /**
-     * Ширина передней оси (расстояние между центрами вращения)
-     */
-    private static final double l2r2 = 448;
-    /**
-     * База (расстояние между передней и задней осью)
-     */
-    private static final double c2c3 = 995;
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
@@ -71,7 +75,7 @@ public class BruteForceAkkerman20 {
         double c1c2,
         double r1r2_x
     ) {
-        final double c2r2 = l2r2 / 2;
+        final double c2r2 = BruteForceConst.L2_R2 / 2;
         // Длина рычага
         final double c1r1 = Trigonometry.length(c2r2 + r1r2_x, c1c2 - r1r2_y);
         // Длина поворотного кулака
@@ -81,10 +85,10 @@ public class BruteForceAkkerman20 {
 
         double e = 0;
         // Подсчет ошибки для углов правого колеса
-        for (double r_a = 20; r_a <= 70; r_a += 1) {
+        for (double r_a = BruteForceConst.MIN_ANGLE; r_a <= BruteForceConst.MAX_ANGLE; r_a += BruteForceConst.STEP_ANGLE) {
             // Идеальное значение угла левого колеса (линии перпендикулярные передним колесам пересекаются и точка пересечения лежит на линии задней оси)
-            double l_a = StrictMath.toDegrees(StrictMath.atan2(c2c3, l2r2 + c2c3 * StrictMath.tan(StrictMath.toRadians(90 - r_a))));
-            // расчет угла левого колеса, согласно указаных параметров кулаков и сошки
+            double l_a = BruteForceConst.getLeftAngle(r_a);
+            // расчет угла левого колеса, согласно указанных параметров кулаков и сошки
             double r1_x = r1r2_x * StrictMath.cos(StrictMath.toRadians(r_a)) + r1r2_y * StrictMath.sin(StrictMath.toRadians(r_a));
             double r1_y = -r1r2_x * StrictMath.sin(StrictMath.toRadians(r_a)) + r1r2_y * StrictMath.cos(StrictMath.toRadians(r_a));
             double c2r1 = Trigonometry.length(c2r2 + r1_x, r1_y);
@@ -95,8 +99,8 @@ public class BruteForceAkkerman20 {
             double l1l2c1 = Trigonometry.angle(r1r2, l2c1, c1r1);
             double c1l1c2 = Trigonometry.angle(l2c1, c2r2, c1c2);
 
-            double l1l2c2 = 90 - l1l2c1 - c1l1c2 + a11;
-            e += StrictMath.pow(l_a - l1l2c2, 2);
+            double l_a_fact = 90 - l1l2c1 - c1l1c2 + a11;
+            e += StrictMath.pow(l_a - l_a_fact, 2);
         }
         return e;
     }

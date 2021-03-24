@@ -14,11 +14,11 @@ public class Trigonometry {
     }
 
     /**
-     * Найти третью сторону треугольника, зная две строны и угол между ними
+     * Найти третью сторону треугольника, зная две стороны и угол между ними
      *
      * @param ab  ребро
      * @param ac  ребро
-     * @param bac угол бежду ребрами
+     * @param bac угол между ребрами
      * @return длина третьей стороны bc
      */
     public static double length(double ab, double ac, double bac) {

@@ -15,22 +15,28 @@ package scooter4ewd;
  *     <li>C3 - центр задней оси</li>
  * </ul>
  * </p>
+ * <p>
+ * <blockquote><pre>
+ *     L1------------------R1
+ *     |                   |
+ *     L2--------C2--------R2
+ *
+ *
+ *
+ *
+ *
+ *
+ *               C3
+ * </blockquote></pre>
+ * </p>
  * <p>Конструкция упирается в ограничение выноса поворотного кулака в стороны 20 мм, больше нельзя будет тереться о колесо.</p>
  * <p>Результат:</p>
  * <p>Вынос поворотного кулака вперед:76.0 мм (относительно центра вращения колеса)</p>
  * <p>Вынос поворотного кулака в стороны:20.0 мм (относительно центра вращения колеса в ширь)</p>
  * <p>Погрешность:153.22931097132113</p>
+ * <p>Time:110ms</p>
  */
 public class BruteForceAkkerman10 {
-
-    /**
-     * Ширина передней оси (расстояние между центрами вращения)
-     */
-    private static final double l2r2 = 448;
-    /**
-     * База (расстояние между передней и задней осью)
-     */
-    private static final double c2c3 = 995;
 
     public static void main(String[] args) {
         long time = System.currentTimeMillis();
@@ -56,12 +62,12 @@ public class BruteForceAkkerman10 {
         System.out.println("Time:" + time + "ms");
     }
 
-    private static double test(
+    public static double test(
         double r1r2_y,
         double r1r2_x
     ) {
         // Длина рейки
-        final double l1r1 = l2r2 + 2 * r1r2_x;
+        final double l1r1 = BruteForceConst.L2_R2 + 2 * r1r2_x;
         // Длина поворотного кулака
         final double r1r2 = Trigonometry.length(r1r2_x, r1r2_y);
         // Угол поворотного кулака
@@ -69,17 +75,17 @@ public class BruteForceAkkerman10 {
 
         double e = 0;
         // Подсчет ошибки для углов правого колеса
-        for (double r_a = 20; r_a <= 70; r_a += 1) {
+        for (double r_a = BruteForceConst.MIN_ANGLE; r_a <= BruteForceConst.MAX_ANGLE; r_a += BruteForceConst.STEP_ANGLE) {
             // Идеальное значение угла левого колеса (линии перпендикулярные передним колесам пересекаются и точка пересечения лежит на линии задней оси)
-            double l_a = StrictMath.toDegrees(StrictMath.atan2(c2c3, l2r2 + c2c3 * StrictMath.tan(StrictMath.toRadians(90 - r_a))));
-            // расчет угла левого колеса, согласно указаных параметров кулаков
+            double l_a = BruteForceConst.getLeftAngle(r_a);
+            // расчет угла левого колеса, согласно указанных параметров кулаков
             double r1_x = r1r2_x * StrictMath.cos(StrictMath.toRadians(r_a)) + r1r2_y * StrictMath.sin(StrictMath.toRadians(r_a));
             double r1_y = -r1r2_x * StrictMath.sin(StrictMath.toRadians(r_a)) + r1r2_y * StrictMath.cos(StrictMath.toRadians(r_a));
-            double l2r1 = Trigonometry.length(l2r2 + r1_x, r1_y);
+            double l2r1 = Trigonometry.length(BruteForceConst.L2_R2 + r1_x, r1_y);
             double l1l2r1 = Trigonometry.angle(r1r2, l2r1, l1r1);
-            double r1l2r2 = Trigonometry.angle(l2r1, l2r2, r1r2);
-            double l1l2r2 = 90 - l1l2r1 - r1l2r2 + a11;
-            e += StrictMath.pow(l_a - l1l2r2, 2);
+            double r1l2r2 = Trigonometry.angle(l2r1, BruteForceConst.L2_R2, r1r2);
+            double l_a_fact = 90 - l1l2r1 - r1l2r2 + a11;
+            e += StrictMath.pow(l_a - l_a_fact, 2);
         }
         return e;
     }
